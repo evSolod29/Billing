@@ -17,7 +17,7 @@ namespace Billing.DAL.Repositories.MemoryRepositories
             if (oldUser == null)
                 throw new KeyNotFoundException($"Key is {user.Id}");
 
-            var newUser = new User(user.Name, user.Rating) { Id = oldUser.Id, Coins = oldUser.Coins };
+            var newUser = new User(user.Name, user.Rating) { Id = oldUser.Id };
 
             context.Users.Remove(oldUser);
             context.Users.Add(newUser);

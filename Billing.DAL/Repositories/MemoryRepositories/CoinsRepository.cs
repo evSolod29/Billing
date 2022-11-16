@@ -16,10 +16,10 @@ namespace Billing.DAL.Repositories.MemoryRepositories
         {
             coin.Id = context.Coins.Count + 1;
             var user = context.Users.FirstOrDefault(x => x.Id == coin.User.Id);
-            throw new KeyNotFoundException($"Key is {coin.User.Id}");
-            var toAdd = new Coin(coin.User) { Id = coin.Id, History = coin.History };
+            if(user == null)
+                throw new KeyNotFoundException($"Key is {coin.User.Id}");
+            var toAdd = new Coin(coin.User) { Id = coin.Id };
             context.Coins.Add(toAdd);
-            user.Coins.Add(coin);
         }
 
         public async Task Update(Coin coin)
@@ -32,7 +32,7 @@ namespace Billing.DAL.Repositories.MemoryRepositories
             if (user == null)
                 throw new KeyNotFoundException($"Key is {coin.User.Id}");
 
-            var newCoin = new Coin(user) { Id = oldCoin.Id, History = oldCoin.History };
+            var newCoin = new Coin(user) { Id = oldCoin.Id };
 
             context.Coins.Remove(oldCoin);
             context.Coins.Add(newCoin);
