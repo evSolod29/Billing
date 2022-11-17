@@ -52,13 +52,26 @@ public class HistoriesRepository
         if(history == null)
             throw new KeyNotFoundException($"History key isn't found. Key is {id}");
 
-        User newUser = new User(history.User.Name, history.User.Rating) { Id = history.User.Id };
-        User coinUser = new User(history.Coin.User.Name, history.Coin.User.Rating) 
-        {
-            Id = history.Coin.User.Id
-        };
-        Coin newCoin = new Coin(coinUser){ Id = history.Coin.Id };
+        return await GetNewHistory(history);
+    }
 
-        return new History(newUser, newCoin) { Id = id };
+    public async Task<IEnumerable<History>> Get()
+    {
+        IEnumerable<History> histories = await Task.WhenAll(context.Histories.Select(async x => await GetNewHistory(x)));
+        return histories;
+    }
+
+    private async Task<History> GetNewHistory(History history)
+    {
+        return await new Task<History>(() => 
+        {
+            User newUser = new User(history.User.Name, history.User.Rating) { Id = history.User.Id };
+            User coinUser = new User(history.Coin.User.Name, history.Coin.User.Rating) 
+            {
+                Id = history.Coin.User.Id
+            };
+            Coin newCoin = new Coin(coinUser){ Id = history.Coin.Id };
+            return new History(newUser, newCoin) { Id = history.Id };
+        });
     }
 }

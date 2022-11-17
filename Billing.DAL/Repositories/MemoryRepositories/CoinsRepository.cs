@@ -14,35 +14,42 @@ namespace Billing.DAL.Repositories.MemoryRepositories
 
         public async Task Add(Coin coin)
         {
-            coin.Id = context.Coins.Count + 1;
-            var user = context.Users.FirstOrDefault(x => x.Id == coin.User.Id);
-            if(user == null)
-                throw new KeyNotFoundException($"Key is {coin.User.Id}");
-            var toAdd = new Coin(coin.User) { Id = coin.Id };
-            context.Coins.Add(toAdd);
+            var coinUser = context.Users.FirstOrDefault(x => x.Id == coin.User.Id);
+            if(coinUser == null)
+                throw new KeyNotFoundException($"User key isn't found. Key is {coin.User.Id}");
+
+            var newCoin = new Coin(coinUser) { Id = context.Coins.Count + 1 };
+            context.Coins.Add(newCoin);
+
+            coin.Id = newCoin.Id;
+            coin.User.Name = coinUser.Name;
+            coin.User.Rating = coinUser.Rating;
         }
 
         public async Task Update(Coin coin)
         {
             var oldCoin = context.Coins.FirstOrDefault(x => x.Id == coin.Id);
             if (oldCoin == null)
-                throw new KeyNotFoundException($"Key is {coin.Id}");
+                throw new KeyNotFoundException($"Coin key isn't found. Key is {coin.Id}");
 
-            var user = context.Users.FirstOrDefault(x => x.Id == coin.User.Id);
-            if (user == null)
-                throw new KeyNotFoundException($"Key is {coin.User.Id}");
+            var coinUser = context.Users.FirstOrDefault(x => x.Id == coin.User.Id);
+            if (coinUser == null)
+                throw new KeyNotFoundException($"User key isn't found. Key is {coin.User.Id}");
 
-            var newCoin = new Coin(user) { Id = oldCoin.Id };
+            var newCoin = new Coin(coinUser) { Id = oldCoin.Id };
 
             context.Coins.Remove(oldCoin);
             context.Coins.Add(newCoin);
+
+            coin.User.Name = coinUser.Name;
+            coin.User.Rating = coinUser.Rating;
         }
 
         public async Task<Coin> Get(long id)
         {
             var coin = context.Coins.FirstOrDefault(x => x.Id == id);
             if (coin == null)
-                throw new KeyNotFoundException($"Key is {id}");
+                throw new KeyNotFoundException($"Coin key isn't found. Key is {id}");
 
             return new Coin(new User(coin.User.Name, coin.User.Rating) { Id = coin.User.Id }) { Id = coin.Id };
         }
@@ -57,7 +64,7 @@ namespace Billing.DAL.Repositories.MemoryRepositories
         public async Task<IEnumerable<Coin>> GetByUserId(long userId)
         {
             if (context.Users.Any(x => x.Id == userId))
-                throw new KeyNotFoundException($"Key is {userId}");
+                throw new KeyNotFoundException($"User key isn't found. Key is {userId}");
 
             return (await Get()).Where(x => x.User.Id == userId);
         }
