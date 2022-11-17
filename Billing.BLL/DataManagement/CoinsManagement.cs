@@ -17,50 +17,56 @@ namespace Billing.BLL.DataManagement
         public async Task CoinsEmission(long amount)
         {
             IEnumerable<User> users = await usersRepo.Get();
-            ICollection<RatingRemainder> remainders = new List<RatingRemainder>();
-            long userCount = 0;
-            long ratingSum = users.Sum(x => {
-                userCount += 1;
-                return x.Rating; 
-            });
-            double coinCost = ratingSum/amount;
-            long coinsCount = amount;
+            int userCount = users.Count();
+
             if (userCount > amount)
                 //TODO: Return failure
                 return;
 
+            long ratingSum = users.Sum(x => x.Rating);
+            long coinsBalance = amount;
+            double coinCost = (double)ratingSum / (amount - userCount);
+            bool isDistributionEnabled = coinsBalance - userCount > 0;
+            ICollection<RatingRemainder>? ratingRemainders = 
+                isDistributionEnabled ? new List<RatingRemainder>() : null;
+
             foreach (User user in users)
             {
-                long coinCount = (long) Math.Truncate(user.Rating / coinCost);
-                coinCount = coinCount > amount - userCount ? 1 : coinCount;
-                coinCount = coinCount < 1 ? 1 : coinCount;
-                double remainder = (user.Rating - coinCount * coinCost);
-
-                if(remainder > 0)
-                    remainders.Add(new RatingRemainder(user, remainder));
-
-                for (long i = 0; i < coinCount; i++)
+                if (isDistributionEnabled)
                 {
-                    await MakeCoin(user);
+                    long award = (long)(user.Rating / coinCost);
+                    double ratingRemainder = user.Rating - award * coinCost;
+                    ratingRemainders!.Add(new RatingRemainder(user, ratingRemainder));
+                    for (int i = 0; i < award; i++)
+                    {
+                        await MakeCoin(user);
+                    }
+                    coinsBalance -= award;
                 }
-                coinsCount -= coinCount;
+                await MakeCoin(user);
+                coinsBalance -= 1;
             }
-            IEnumerable<RatingRemainder> orderedRemainders = remainders.OrderByDescending(x => x.Remainder);
-            IEnumerator<RatingRemainder> enumerator = orderedRemainders.GetEnumerator();
-            while(coinsCount > 0)
+
+            if(coinsBalance == 0)
+                return;
+
+            IEnumerable<RatingRemainder> orderedRR 
+                = ratingRemainders!.OrderByDescending(x => x.Remainder);
+            IEnumerator<RatingRemainder> enumerator = orderedRR.GetEnumerator();
+
+            while(coinsBalance > 0)
             {
                 if(!enumerator.MoveNext())
                 {
-                    enumerator = orderedRemainders.GetEnumerator();
+                    enumerator = orderedRR.GetEnumerator();
                     enumerator.MoveNext();
                 }
-                    
-
 
                 await MakeCoin(enumerator.Current.User);
-                coinsCount -= 1;
+                coinsBalance -= 1;
             }
         }
+
 
         private async Task<Coin> MakeCoin(User user)
         {
@@ -78,7 +84,7 @@ namespace Billing.BLL.DataManagement
             User = user;
             Remainder = remainder;
         }
-
+        public int ta { get; set; }
         public User User { get; set; }
         public double Remainder { get; set; }
     }

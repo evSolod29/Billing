@@ -13,7 +13,7 @@ namespace Billing.Tests.BLL
             MemoryContext context = MakeContext();
             CoinsManagement coinsManagement = new CoinsManagement(new CoinsRepository(context),
                                                                   new UsersRepository(context));
-            await coinsManagement.CoinsEmission(7);
+            await coinsManagement.CoinsEmission(10000);
             int boris = context.Coins.Where(x => x.User.Id == 1).Count();
             int maria = context.Coins.Where(x => x.User.Id == 2).Count();
             int oleg = context.Coins.Where(x => x.User.Id == 3).Count();
