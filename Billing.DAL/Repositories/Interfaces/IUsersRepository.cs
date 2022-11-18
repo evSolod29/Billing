@@ -2,10 +2,8 @@ using Billing.DAL.Models;
 
 namespace Billing.DAL.Repositories.Interfaces
 {
-    public interface IUsersRepository
+    public interface IUsersRepository:IGenericRepository<User>
     {
-        Task<User?> Get(long id);
-        Task<IEnumerable<User>> Get();
-        Task Update(User user);
+        Task<long> Count();
     }
 }

@@ -1,8 +1,7 @@
 {
     "files.exclude": {
         "**/bin": true,
-        "**/obj": true,
-        "*.sln":true,
+        "**/obj": true
     },
     "editor.formatOnType": true
 }

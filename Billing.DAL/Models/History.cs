@@ -2,14 +2,12 @@ namespace Billing.DAL.Models
 {
     public class History
     {
-        public History(User user, Coin coin)
-        {
-            User = user;
-            Coin = coin;
-        }
-
         public long Id { get; set; }
-        public User User { get; set; }
-        public Coin Coin { get; set; }
+        public long CoinId { get; set; }
+        public Coin Coin { get; set; } = null!;
+        public long? FromUserId { get; set; }
+        public User? FromUser { get; set; }
+        public long ToUserId { get; set; }
+        public User ToUser { get; set; } = null!;
     }
 }

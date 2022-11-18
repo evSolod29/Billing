@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Billing.DAL", "Billing.DAL\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Billing.BLL", "Billing.BLL\Billing.BLL.csproj", "{87B2DF00-CDC6-4B75-9A6A-57453EED8558}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Billing.Tests.DAL", "Billing.Tests.DAL\Billing.Tests.DAL.csproj", "{A3EB0121-73BE-4565-8547-0A4C8F884926}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Billing.Tests.BLL", "Billing.Tests.BLL\Billing.Tests.BLL.csproj", "{31283914-E42F-40FB-91B6-6548184397BB}"
 EndProject
 Global
