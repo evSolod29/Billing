@@ -1,29 +1,20 @@
 using Billing.BLL.DataManagement;
-using Billing.BLL.Helpers.Interfaces;
-using Billing.BLL.Helpers.Models;
 using Billing.DAL.Models;
 using Billing.Tests.BLL.Fixtures;
 using Billing.Tests.BLL.Comparers;
+using Billing.BLL.DTO;
 
 namespace Billing.Tests.BLL.DataManagement
 {
     public class CoinsManagementTests: IDisposable
     {
         private readonly DatabaseFixture database;
-        private readonly Mock<ICalculatingRewards> calcMock;
 
         public CoinsManagementTests()
         {
             database = new DatabaseFixture();
             database.DbContext.Add(new User() { Name = "boris", Rating = 5000 });
             database.DbContext.SaveChanges();
-
-            calcMock = new Mock<ICalculatingRewards>();
-            calcMock.Setup(x => x.GetRewardsInfo(It.IsAny<IEnumerable<User>>(),
-                                                 It.IsAny<long>(),
-                                                 It.IsAny<long>()))
-                    .Returns<IEnumerable<User>, long, long>((users, count, amount) => GetRewardsInfo(users,
-                                                                                                     amount));
             
         }
 
@@ -37,9 +28,7 @@ namespace Billing.Tests.BLL.DataManagement
         {
             long expected = 10;
 
-            ICalculatingRewards calc = calcMock.Object;
-            CoinsManagement management = new CoinsManagement(database.UnitOfWork, calc);
-
+            CoinsManagement management = new CoinsManagement(database.UnitOfWork);
             await management.CoinsEmission(expected);
             long actual = database.DbContext.Coins.LongCount();
 
@@ -51,7 +40,7 @@ namespace Billing.Tests.BLL.DataManagement
         {
             long expected = 10;
 
-            CoinsManagement management = new CoinsManagement(database.UnitOfWork, calcMock.Object);
+            CoinsManagement management = new CoinsManagement(database.UnitOfWork);
             await management.CoinsEmission(expected);
 
             long actual = database.DbContext.Histories.LongCount();
@@ -65,7 +54,7 @@ namespace Billing.Tests.BLL.DataManagement
             User coinUser = database.UnitOfWork.UsersRepository.GetAllAsQueryable().First();
             Coin expected = new Coin() { User = coinUser, UserId = coinUser.Id, Id = 1 };
 
-            CoinsManagement management = new CoinsManagement(database.UnitOfWork, calcMock.Object);
+            CoinsManagement management = new CoinsManagement(database.UnitOfWork);
             await management.CoinsEmission(1);
 
             Coin actual = database.DbContext.Coins.First();
@@ -87,7 +76,7 @@ namespace Billing.Tests.BLL.DataManagement
                 ToUserId = coinUser.Id
             };
 
-            CoinsManagement management = new CoinsManagement(database.UnitOfWork, calcMock.Object);
+            CoinsManagement management = new CoinsManagement(database.UnitOfWork);
             await management.CoinsEmission(1);
 
             History actual = database.DbContext.Histories.First();

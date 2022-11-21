@@ -1,5 +1,4 @@
-﻿using Billing.DAL.Contexts;
-using Billing.DAL.Models;
+﻿using Billing.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Billing.API

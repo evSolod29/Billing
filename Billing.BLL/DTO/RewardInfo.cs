@@ -1,6 +1,6 @@
 using Billing.DAL.Models;
 
-namespace Billing.BLL.Helpers.Models
+namespace Billing.BLL.DTO
 {
     public class RewardInfo
     {

@@ -2,8 +2,6 @@ using Billing.BLL.DataManagement.Interfaces;
 using Billing.BLL.DTO;
 using Billing.BLL.Exceptions;
 using Billing.BLL.Extensions;
-using Billing.BLL.Helpers.Interfaces;
-using Billing.BLL.Helpers.Models;
 using Billing.DAL.Models;
 using Billing.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -16,31 +14,62 @@ namespace Billing.BLL.DataManagement
         private readonly ICoinsRepository coinsRepo;
         private readonly IUsersRepository usersRepo;
         private readonly IHistoriesRepository historiesRepo;
-        private readonly ICalculatingRewards calculatingRewards;
 
-        public CoinsManagement(IUnitOfWork unitOfWork, ICalculatingRewards calculatingRewards)
+        public CoinsManagement(IUnitOfWork unitOfWork)
         {
             repos = unitOfWork;
             this.coinsRepo = repos.CoinsRepository;
             this.historiesRepo = repos.HistoriesRepository;
             this.usersRepo = repos.UsersRepository;
-            this.calculatingRewards = calculatingRewards;
         }
 
         public async Task CoinsEmission(long amount)
         {
-            IEnumerable<User> users = await usersRepo.GetAll();
-            long userCount = await usersRepo.Count();
+            var users = (await usersRepo.GetAll());
 
-            foreach (RewardInfo info in calculatingRewards.GetRewardsInfo(users, userCount, amount))
+            if (await usersRepo.Count() > amount)
+                throw new WrongQuantityException($"Wrong coin count. " +
+                    $"The number of coins must not be less than count of users.");
+
+            IEnumerable<RewardInfo> rewards = GetReward(users, amount);
+
+            foreach (RewardInfo info in rewards)
             {
-                for (long i = 0; i < info.Reward; i++)
+                for (int i = 0; i < info.Reward; i++)
                 {
-                    await MakeCoin(info.User);
+                    Coin coin = new Coin() { UserId = info.User.Id };
+                    await coinsRepo.Add(coin);
+
+                    History history = new History() { CoinId = coin.Id, ToUserId = info.User.Id };
+                    await historiesRepo.Add(history);
                 }
             }
 
             await repos.SaveChanges();
+        }
+
+        private static IEnumerable<RewardInfo> GetReward(IEnumerable<User> users, long coinsBalance)
+        {
+            double coinCost = (double)users.Sum(x => x.Rating) / coinsBalance;
+
+            ICollection<RewardInfo> rewards = users.Select(x =>
+            {
+                long reward = (long)Math.Truncate(x.Rating / coinCost);
+                reward = reward > 1 ? reward : 1;
+                coinsBalance -= reward;
+                return new RewardInfo(x, x.Rating - (reward * coinCost), reward);
+            }).ToList();
+
+            IEnumerator<RewardInfo> enumerator = rewards.Where(x => x.Rating > 0)
+                .OrderByDescending(x => x.Rating).GetEnumerator();
+
+            while (coinsBalance > 0 && enumerator.MoveNext())
+            {
+                enumerator.Current.Reward++;
+                coinsBalance--;
+            }
+
+            return rewards;
         }
 
         public async Task MoveCoinByUserName(string srcUsrName, string dstUserName, long amount)
@@ -88,15 +117,5 @@ namespace Billing.BLL.DataManagement
 
             return user;
         }
-
-        private async Task MakeCoin(User user)
-        {
-            Coin coin = new Coin() { UserId = user.Id };
-            await coinsRepo.Add(coin);
-
-            History history = new History() { CoinId = coin.Id, ToUserId = user.Id };
-            await historiesRepo.Add(history);
-        }
-
     }
 }
