@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Contexts\Interfaces\" />
+    <Compile Remove="Contexts\Interfaces\**" />
+    <EmbeddedResource Remove="Contexts\Interfaces\**" />
+    <None Remove="Contexts\Interfaces\**" />
   </ItemGroup>
 
   <ItemGroup>

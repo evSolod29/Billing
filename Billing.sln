@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Billing", "Billing\Billing.csproj", "{A5723C5D-0928-4854-A7F7-66F72920C4C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.API", "Billing.API\Billing.API.csproj", "{A5723C5D-0928-4854-A7F7-66F72920C4C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Billing.DAL", "Billing.DAL\Billing.DAL.csproj", "{F5EBD868-B399-4DF8-9632-F9DEA9F8905E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.DAL", "Billing.DAL\Billing.DAL.csproj", "{F5EBD868-B399-4DF8-9632-F9DEA9F8905E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Billing.BLL", "Billing.BLL\Billing.BLL.csproj", "{87B2DF00-CDC6-4B75-9A6A-57453EED8558}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.BLL", "Billing.BLL\Billing.BLL.csproj", "{87B2DF00-CDC6-4B75-9A6A-57453EED8558}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Billing.Tests.BLL", "Billing.Tests.BLL\Billing.Tests.BLL.csproj", "{31283914-E42F-40FB-91B6-6548184397BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.Tests.BLL", "Billing.Tests.BLL\Billing.Tests.BLL.csproj", "{31283914-E42F-40FB-91B6-6548184397BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,6 @@ Global
 		{87B2DF00-CDC6-4B75-9A6A-57453EED8558}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87B2DF00-CDC6-4B75-9A6A-57453EED8558}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87B2DF00-CDC6-4B75-9A6A-57453EED8558}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A3EB0121-73BE-4565-8547-0A4C8F884926}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A3EB0121-73BE-4565-8547-0A4C8F884926}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A3EB0121-73BE-4565-8547-0A4C8F884926}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A3EB0121-73BE-4565-8547-0A4C8F884926}.Release|Any CPU.Build.0 = Release|Any CPU
 		{31283914-E42F-40FB-91B6-6548184397BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31283914-E42F-40FB-91B6-6548184397BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31283914-E42F-40FB-91B6-6548184397BB}.Release|Any CPU.ActiveCfg = Release|Any CPU

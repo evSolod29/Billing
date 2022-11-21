@@ -9,4 +9,7 @@ public class HistoriesRepository : GenericRepository<History>, IHistoriesReposit
     public HistoriesRepository(DbContext context) : base(context)
     {
     }
+
+    public async Task<IEnumerable<History>> GetAllByCoinId(long coinId)
+        => await _db.Where(x => x.CoinId == coinId).ToListAsync();
 }

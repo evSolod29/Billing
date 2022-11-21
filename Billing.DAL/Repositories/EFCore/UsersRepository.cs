@@ -12,5 +12,7 @@ namespace Billing.DAL.Repositories.MemoryRepositories
         }
 
         public async Task<long> Count() => await _db.LongCountAsync();
+        public async Task<User?> GetByName(string name) 
+            => await _db.SingleOrDefaultAsync(x => x.Name == name);
     }
 }

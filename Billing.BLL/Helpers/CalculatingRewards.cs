@@ -1,6 +1,7 @@
 using Billing.DAL.Models;
 using Billing.BLL.Helpers.Interfaces;
 using Billing.BLL.Helpers.Models;
+using Billing.BLL.Exceptions;
 
 namespace Billing.BLL.Helpers
 {
@@ -9,8 +10,8 @@ namespace Billing.BLL.Helpers
         public IEnumerable<RewardInfo> GetRewardsInfo(IEnumerable<User> users, long userCount, long totalReward)
         {
             if (userCount > totalReward)
-                //TODO: Return failure
-                throw new Exception();
+                throw new WrongQuantityException($"Wrong coin count. " +
+                    $"The number of coins must not be less than {userCount}.");
 
             long ratingSum = users.Sum(x => x.Rating);
             long coinsBalance = totalReward;
@@ -41,13 +42,14 @@ namespace Billing.BLL.Helpers
             return rewards;
         }
 
-        private RewardInfo AccrualRewardByRating(ICollection<RewardInfo>? ratingRemainders,
+        private RewardInfo AccrualRewardByRating(ICollection<RewardInfo> ratingRemainders,
                                                  User user,
                                                  double coinCost)
         {
             long reward = (long)(user.Rating / coinCost);
             double ratingRemainder = user.Rating - reward * coinCost;
-            RewardInfo rewardInfo = user.Rating < coinCost? new RewardInfo(user, 0, 1) : new RewardInfo(user, ratingRemainder, reward);
+            RewardInfo rewardInfo = user.Rating < coinCost? new RewardInfo(user, 0, 1) 
+                : new RewardInfo(user, ratingRemainder, reward);
             ratingRemainders!.Add(rewardInfo);
             return rewardInfo;
         }

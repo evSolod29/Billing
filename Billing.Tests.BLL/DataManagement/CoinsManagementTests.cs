@@ -3,6 +3,7 @@ using Billing.BLL.Helpers.Interfaces;
 using Billing.BLL.Helpers.Models;
 using Billing.DAL.Models;
 using Billing.Tests.BLL.Fixtures;
+using Billing.Tests.BLL.Comparers;
 
 namespace Billing.Tests.BLL.DataManagement
 {
@@ -22,7 +23,6 @@ namespace Billing.Tests.BLL.DataManagement
                                                  It.IsAny<long>(),
                                                  It.IsAny<long>()))
                     .Returns<IEnumerable<User>, long, long>((users, count, amount) => GetRewardsInfo(users,
-                                                                                                     count,
                                                                                                      amount));
             
         }
@@ -61,6 +61,7 @@ namespace Billing.Tests.BLL.DataManagement
         [Fact]
         public async void CoinsEmission_ValidCoinAdded()
         {
+            IEqualityComparer<Coin> comparer = new CoinComparer();
             User coinUser = database.UnitOfWork.UsersRepository.GetAllAsQueryable().First();
             Coin expected = new Coin() { User = coinUser, UserId = coinUser.Id, Id = 1 };
 
@@ -68,10 +69,32 @@ namespace Billing.Tests.BLL.DataManagement
             await management.CoinsEmission(1);
 
             Coin actual = database.DbContext.Coins.First();
-            Assert.Equal(expected, actual);
+            Assert.Equal(expected, actual, comparer);
         }
 
-        private IEnumerable<RewardInfo> GetRewardsInfo(IEnumerable<User> users, long userCount, long totalReward)
+        [Fact]
+        public async void CoinsEmission_ValidHistoryAdded()
+        {
+            IEqualityComparer<History> comparer = new HistoryComparer();
+            User coinUser = database.UnitOfWork.UsersRepository.GetAllAsQueryable().First();
+            Coin coin = new Coin() { User = coinUser, UserId = coinUser.Id, Id = 1 };
+            History expected = new History() 
+            { 
+                Id = 1, 
+                Coin = coin, 
+                CoinId = coin.Id, 
+                ToUser = coinUser, 
+                ToUserId = coinUser.Id
+            };
+
+            CoinsManagement management = new CoinsManagement(database.UnitOfWork, calcMock.Object);
+            await management.CoinsEmission(1);
+
+            History actual = database.DbContext.Histories.First();
+            Assert.Equal(expected, actual, comparer);
+        }
+
+        private static IEnumerable<RewardInfo> GetRewardsInfo(IEnumerable<User> users, long totalReward)
             => new List<RewardInfo>() { new RewardInfo(users.First(), 0, totalReward) };
     }
 }
