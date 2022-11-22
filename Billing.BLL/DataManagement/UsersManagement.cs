@@ -6,6 +6,9 @@ using Billing.DAL.Repositories.Interfaces;
 
 namespace Billing.BLL.DataManagement
 {
+    /// <summary>
+    /// Класс управления пользователями
+    /// </summary>
     public class UsersManagement : IUsersManagement
     {
         private readonly IUsersRepository usersRepository;
@@ -17,6 +20,10 @@ namespace Billing.BLL.DataManagement
             this.repos = repos;
         }
 
+        /// <summary>
+        /// Получение списка пользователей.
+        /// </summary>
+        /// <returns></returns>
         public async Task<IEnumerable<UserDTO>> Get()
         {
             ICollection<UserDTO> userDTOs = new List<UserDTO>();

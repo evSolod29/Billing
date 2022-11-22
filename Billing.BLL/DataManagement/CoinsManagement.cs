@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Billing.BLL.DataManagement
 {
+    /// <summary>
+    /// Класс управления монетами
+    /// </summary>
     public class CoinsManagement : ICoinsManagement
     {
         private readonly IUnitOfWork repos;
@@ -23,6 +26,13 @@ namespace Billing.BLL.DataManagement
             usersRepo = repos.UsersRepository;
         }
 
+        /// <summary>
+        /// Начисление монет всем пользователям с учётом рейтинга, но не менее одной.
+        /// </summary>
+        /// <param name="amount">Количество монет для начисления.</param>
+        /// <returns></returns>
+        /// <exception cref="WrongQuantityException">Количество монет меньше,
+        /// чем количество пользователей.</exception>
         public async Task CoinsEmission(long amount)
         {
             var users = await usersRepo.GetAll();
@@ -48,6 +58,14 @@ namespace Billing.BLL.DataManagement
             await repos.SaveChanges();
         }
 
+        /// <summary>
+        /// Перемещение монет между пользователями.
+        /// </summary>
+        /// <param name="srcUsrName">Имя пользователя у которого берутся монеты.</param>
+        /// <param name="dstUserName">Имя пользователь которому отдаются монеты.</param>
+        /// <param name="amount">Количество монет.</param>
+        /// <returns></returns>
+        /// <exception cref="WrongQuantityException">У пользователя недостаточно монет.</exception>
         public async Task MoveCoinsByUserName(string srcUsrName, string dstUserName, long amount)
         {
             User srcUser = CheckUserByNull(await usersRepo.GetByName(srcUsrName));
@@ -72,6 +90,11 @@ namespace Billing.BLL.DataManagement
             await repos.SaveChanges();
         }
 
+        /// <summary>
+        /// Получение монеты с самой больщой историей.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotFoundException">Нет историй монет.</exception>
         public async Task<CoinDTO> LongestHistoryCoin()
         {
             Coin? coin = await coinsRepo.GetAllAsQueryable().Include(x => x.Histories)
