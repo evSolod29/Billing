@@ -1,7 +1,7 @@
 ﻿using Billing.DAL.Models;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Billing.Tests.BLL.Comparers
+namespace Billing.UnitTests.BLL.Comparers
 {
     internal class HistoryComparer : IEqualityComparer<History>
     {

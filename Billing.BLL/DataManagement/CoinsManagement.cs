@@ -18,14 +18,14 @@ namespace Billing.BLL.DataManagement
         public CoinsManagement(IUnitOfWork unitOfWork)
         {
             repos = unitOfWork;
-            this.coinsRepo = repos.CoinsRepository;
-            this.historiesRepo = repos.HistoriesRepository;
-            this.usersRepo = repos.UsersRepository;
+            coinsRepo = repos.CoinsRepository;
+            historiesRepo = repos.HistoriesRepository;
+            usersRepo = repos.UsersRepository;
         }
 
         public async Task CoinsEmission(long amount)
         {
-            var users = (await usersRepo.GetAll());
+            var users = await usersRepo.GetAll();
 
             if (await usersRepo.Count() > amount)
                 throw new WrongQuantityException($"Wrong coin count. " +
@@ -48,31 +48,7 @@ namespace Billing.BLL.DataManagement
             await repos.SaveChanges();
         }
 
-        private static IEnumerable<RewardInfo> GetReward(IEnumerable<User> users, long coinsBalance)
-        {
-            double coinCost = (double)users.Sum(x => x.Rating) / coinsBalance;
-
-            ICollection<RewardInfo> rewards = users.Select(x =>
-            {
-                long reward = (long)Math.Truncate(x.Rating / coinCost);
-                reward = reward > 1 ? reward : 1;
-                coinsBalance -= reward;
-                return new RewardInfo(x, x.Rating - (reward * coinCost), reward);
-            }).ToList();
-
-            IEnumerator<RewardInfo> enumerator = rewards.Where(x => x.Rating > 0)
-                .OrderByDescending(x => x.Rating).GetEnumerator();
-
-            while (coinsBalance > 0 && enumerator.MoveNext())
-            {
-                enumerator.Current.Reward++;
-                coinsBalance--;
-            }
-
-            return rewards;
-        }
-
-        public async Task MoveCoinByUserName(string srcUsrName, string dstUserName, long amount)
+        public async Task MoveCoinsByUserName(string srcUsrName, string dstUserName, long amount)
         {
             User srcUser = CheckUserByNull(await usersRepo.GetByName(srcUsrName));
             User dstUser = CheckUserByNull(await usersRepo.GetByName(dstUserName));
@@ -98,8 +74,6 @@ namespace Billing.BLL.DataManagement
 
         public async Task<CoinDTO> LongestHistoryCoin()
         {
-            var a = await coinsRepo.GetAllAsQueryable().Include(x => x.Histories)
-                .OrderByDescending(x => x.Histories.Count()).ToListAsync();
             Coin? coin = await coinsRepo.GetAllAsQueryable().Include(x => x.Histories)
                 .ThenInclude(x => x.ToUser).OrderByDescending(x => x.Histories.Count())
                 .FirstOrDefaultAsync();
@@ -110,7 +84,33 @@ namespace Billing.BLL.DataManagement
             return coin.ToDTO();
         }
 
-        private User CheckUserByNull(User? user)
+        private static IEnumerable<RewardInfo> GetReward(IEnumerable<User> users, long coinsBalance)
+        {
+            double coinCost = (double)users.Sum(x => x.Rating) / coinsBalance;
+            long maxReward = coinsBalance - users.Count(x => x.Rating < coinCost);
+
+            ICollection<RewardInfo> rewards = users.Select(x =>
+            {
+                long reward = (long)Math.Truncate(x.Rating / coinCost);
+                reward = reward > 1 ? reward : 1;
+                reward = reward > maxReward ? maxReward : reward;
+                coinsBalance -= reward;
+                return new RewardInfo(x, x.Rating - (reward * coinCost), reward);
+            }).ToList();
+
+            IEnumerator<RewardInfo> enumerator = rewards.Where(x => x.Rating > 0)
+                .OrderByDescending(x => x.Rating).GetEnumerator();
+
+            while (coinsBalance > 0 && enumerator.MoveNext())
+            {
+                enumerator.Current.Reward++;
+                coinsBalance--;
+            }
+
+            return rewards;
+        }
+
+        private static User CheckUserByNull(User? user)
         {
             if (user == null)
                 throw new NotFoundException("User is not found");

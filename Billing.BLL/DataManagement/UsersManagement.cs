@@ -9,25 +9,21 @@ namespace Billing.BLL.DataManagement
     public class UsersManagement : IUsersManagement
     {
         private readonly IUsersRepository usersRepository;
-        private readonly ICoinsRepository coinsRepository;
         private readonly IUnitOfWork repos;
 
         public UsersManagement(IUnitOfWork repos)
         {
             usersRepository = repos.UsersRepository;
-            coinsRepository = repos.CoinsRepository;
             this.repos = repos;
         }
 
         public async Task<IEnumerable<UserDTO>> Get()
         {
             ICollection<UserDTO> userDTOs = new List<UserDTO>();
-            IEnumerable<User> users = await usersRepository.GetAll();
+            IEnumerable<User> users = await usersRepository.GetAllWithInclude(x => x.Coins);
 
             foreach (User user in users)
-            {
-                userDTOs.Add(user.ToDTO(await coinsRepository.GetUserCoinAmount(user.Id)));
-            }
+                userDTOs.Add(user.ToDTO());
 
             return userDTOs;
         }

@@ -3,17 +3,17 @@ using Billing.DAL.Repositories.EFCore;
 using Billing.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Billing.Tests.BLL.Fixtures
+namespace Billing.UnitTests.BLL.Fixtures
 {
     public class DatabaseFixture: IDisposable
     {
         private readonly BillingContext context;
         private readonly IUnitOfWork unitOfWork;
 
-        public DatabaseFixture()
+        public DatabaseFixture(string dbName)
         {
             DbContextOptionsBuilder options = new DbContextOptionsBuilder<BillingContext>();
-            options.UseInMemoryDatabase("Billing");
+            options.UseInMemoryDatabase(dbName);
             context = new BillingContext(options.Options);
             context.Database.EnsureCreated();
             unitOfWork = new UnitOfWork(context);

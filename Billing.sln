@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.DAL", "Billing.DAL\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.BLL", "Billing.BLL\Billing.BLL.csproj", "{87B2DF00-CDC6-4B75-9A6A-57453EED8558}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.Tests.BLL", "Billing.Tests.BLL\Billing.Tests.BLL.csproj", "{31283914-E42F-40FB-91B6-6548184397BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.UnitTests.BLL", "Billing.UnitTests.BLL\Billing.UnitTests.BLL.csproj", "{31283914-E42F-40FB-91B6-6548184397BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

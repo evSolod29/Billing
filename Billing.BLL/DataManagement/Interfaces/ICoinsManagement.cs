@@ -6,6 +6,6 @@ namespace Billing.BLL.DataManagement.Interfaces
     {
         Task CoinsEmission(long amount);
         Task<CoinDTO> LongestHistoryCoin();
-        Task MoveCoinByUserName(string srcUsrName, string dstUserName, long amount);
+        Task MoveCoinsByUserName(string srcUsrName, string dstUserName, long amount);
     }
 }

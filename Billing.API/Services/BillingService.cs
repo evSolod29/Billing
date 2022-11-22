@@ -69,7 +69,7 @@ namespace Billing.API.Services
         {
             try
             {
-                await coinsManagement.MoveCoinByUserName(request.SrcUser, request.DstUser, request.Amount);
+                await coinsManagement.MoveCoinsByUserName(request.SrcUser, request.DstUser, request.Amount);
             }
             catch (BusinessLogicException ex)
             {
